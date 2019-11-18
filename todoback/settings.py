@@ -154,3 +154,6 @@ JWT_AUTH = {
 
 # cors는 외부데이터를 화이트리스트처리(전체를 처리, 배포단계에서는 false)
 CORS_ORIGIN_ALLOW_ALL = True
+
+# user를 바꿨으니 그거를 적어놓아야함
+AUTH_USER_MODEL = "todos.USer"
