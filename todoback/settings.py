@@ -11,6 +11,7 @@ https://docs.djangoproject.com/en/2.2/ref/settings/
 """
 
 import os
+import datetime
 
 # Build paths inside the project like this: os.path.join(BASE_DIR, ...)
 BASE_DIR = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
@@ -20,6 +21,8 @@ BASE_DIR = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
 # See https://docs.djangoproject.com/en/2.2/howto/deployment/checklist/
 
 # SECURITY WARNING: keep the secret key used in production secret!
+
+# django에서 지원. sorting을 쓰거나 랜덤한 것이 필요하면
 SECRET_KEY = 'jsk1_5c8b9al%x_)ljsj&_6hvpg9osqk)9$v*e)zi9nu88#05l'
 
 # SECURITY WARNING: don't run with debug turned on in production!
@@ -32,6 +35,8 @@ ALLOWED_HOSTS = []
 
 INSTALLED_APPS = [
     'todos',
+    'rest_framework',
+    'corsheaders',
     'django.contrib.admin',
     'django.contrib.auth',
     'django.contrib.contenttypes',
@@ -43,6 +48,8 @@ INSTALLED_APPS = [
 MIDDLEWARE = [
     'django.middleware.security.SecurityMiddleware',
     'django.contrib.sessions.middleware.SessionMiddleware',
+    # 얘는 CommonMiddleware보다는 높게 있어야한다.(공식문서에 나와있음)
+    'corsheaders.middleware.CorsMiddleware',
     'django.middleware.common.CommonMiddleware',
     'django.middleware.csrf.CsrfViewMiddleware',
     'django.contrib.auth.middleware.AuthenticationMiddleware',
@@ -119,3 +126,31 @@ USE_TZ = True
 # https://docs.djangoproject.com/en/2.2/howto/static-files/
 
 STATIC_URL = '/static/'
+
+REST_FRAMEWORK = {
+    'DEFAULT_PERMISSION_CLASSES': (
+        'rest_framework.permissions.IsAuthenticated',
+    ),
+    'DEFAULT_AUTHENTICATION_CLASSES': (
+        'rest_framework_jwt.authentication.JSONWebTokenAuthentication',
+        'rest_framework.authentication.SessionAuthentication',
+        'rest_framework.authentication.BasicAuthentication',
+    ),
+}
+
+# jwt token. 
+# 내 아이디에 대한 권한과 똑같다.
+
+JWT_AUTH = {
+    'JWT_SECRET_KEY': SECRET_KEY,
+    # 암호화를 시킬방법
+    'JWT_ALGORITHM': 'HS256',
+    'JWT_ALLOW_REFRESH': True,
+    # 사용자가 일정시간이 지나도 로그인이 되어있으면 이 키를 사용할 수 없다.메인토큰. 진입할 수 있는토큰
+    'JWT_EXPIRATION_DELTA': datetime.timedelta(days=3),
+    # 만료가 된 토큰을 재발급받기위한 토큰
+    'JWT_REFRESH_EXPIRATION_DELTA': datetime.timedelta(days=7),
+}
+
+# cors는 외부데이터를 화이트리스트처리(전체를 처리, 배포단계에서는 false)
+CORS_ORIGIN_ALLOW_ALL = True
