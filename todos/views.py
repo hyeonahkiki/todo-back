@@ -1,11 +1,11 @@
 # 각각 json응답, http응답
 from django.http import JsonResponse, HttpResponse
-from django.shortcuts import render
+from django.shortcuts import render, get_object_or_404
 from .serializers import TodoSerializer
 from rest_framework.decorators import api_view, permission_classes, authentication_classes
 from rest_framework.permissions import IsAuthenticated
 from rest_framework_jwt.authentication import JSONWebTokenAuthentication
-
+from .models import Todo
 
 # Create your views here.
 
@@ -26,3 +26,24 @@ def todo_create(request):
         # 그냥 serializer.data만 리턴하면 파이썬에서만 사용할 수 있다.
         return JsonResponse(serializer.data)
     return HttpResponse(status=400)
+
+
+@api_view(['PUT', 'GET', 'DELETE'])
+@permission_classes((IsAuthenticated,))
+@authentication_classes((JSONWebTokenAuthentication,))
+def todo_detail(request, id):
+    todo = get_object_or_404(Todo, id=id)
+    if request.method =='GET':
+        serializer = TodoSerializer(todo)
+        return JsonResponse(serializer.data)
+    elif request.method =='PUT':
+        serializer = TodoSerializer(todo, data=request.data)
+        if serializer.is_valid():
+            serializer.save()
+            return JsonResponse(serializer.data)
+        return HttpResponse(status=400)
+    elif request.method == 'DELETE':
+        todo.delete()
+        # 먼가 처리는 했는데 반환한 값이 없을때(204에러)
+        return JsonResponse({"msg": "삭제되었습니다."})
+        # return HttpResponse(status=204)
