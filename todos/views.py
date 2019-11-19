@@ -1,11 +1,11 @@
 # 각각 json응답, http응답
 from django.http import JsonResponse, HttpResponse
 from django.shortcuts import render, get_object_or_404
-from .serializers import TodoSerializer
+from .serializers import TodoSerializer, UserSerializer
 from rest_framework.decorators import api_view, permission_classes, authentication_classes
 from rest_framework.permissions import IsAuthenticated
 from rest_framework_jwt.authentication import JSONWebTokenAuthentication
-from .models import Todo
+from .models import Todo, User
 
 # Create your views here.
 
@@ -45,5 +45,18 @@ def todo_detail(request, id):
     elif request.method == 'DELETE':
         todo.delete()
         # 먼가 처리는 했는데 반환한 값이 없을때(204에러)
-        return JsonResponse({"msg": "삭제되었습니다."})
-        # return HttpResponse(status=204)
+        # return JsonResponse({"msg": "삭제되었습니다."})
+        return HttpResponse(status=204)
+
+@api_view(['GET'])
+@permission_classes((IsAuthenticated,))
+@authentication_classes((JSONWebTokenAuthentication,))
+def user_detail(request, id):
+    user = get_object_or_404(User, id=id)
+    # 요청한 사람 != todo를 쓴사람:
+    if request.user != user:
+        # 권한이 거절되었다는 에러
+        return HttpResponse(status=403)
+    if request.method =='GET':
+        serializer = UserSerializer(user)
+        return JsonResponse(serializer.data)
