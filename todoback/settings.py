@@ -139,7 +139,7 @@ REST_FRAMEWORK = {
 }
 
 # jwt token. 
-# 내 아이디에 대한 권한과 똑같다.
+# 내 아이디에 대한 권한과 똑같다
 
 JWT_AUTH = {
     'JWT_SECRET_KEY': SECRET_KEY,
