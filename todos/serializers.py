@@ -1,5 +1,7 @@
 # 직렬화 작업. 수정, 삭제를 여기서 작업
-# 직렬화????????????????????????????
+# serializer는 queryset과 모델 인스턴스와 같은 복잡한데이터를
+# JSON 또는 다른 콘텐츠 유형으로 쉽게 변환. 또한 serializer는 받은 데이터의
+# 유효서을 검사한 다음 복잡한 타입으로 형변환 할 수 있도록 serialization제공
 from rest_framework import serializers
 from .models import Todo, User
 
